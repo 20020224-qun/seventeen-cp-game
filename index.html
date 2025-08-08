@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8" />
+    <title>SEVENTEEN CP 配對遊戲</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 30px auto; }
+        h1 { text-align: center; }
+        label { display: block; margin: 5px 0; }
+        #cp-list { max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; }
+        button { margin-top: 10px; padding: 10px 20px; }
+    </style>
+</head>
+<body>
+    <h1>💎 SEVENTEEN CP 配對遊戲 💎</h1>
+
+    <div id="nickname-section">
+        <label for="nickname">請輸入你的暱稱：</label>
+        <input type="text" id="nickname" />
+        <button id="start-btn">開始遊戲</button>
+    </div>
+
+    <div id="game-section" style="display:none;">
+        <p id="welcome"></p>
+        <p>請選擇你喜歡的 CP（可複選）：</p>
+        <div id="cp-list"></div>
+        <button id="submit-btn">提交</button>
+    </div>
+
+    <script>
+        const members = ["勝哲","淨漢","知秀","俊輝","順榮","圓佑","知勳","明浩","珉奎","碩珉","勝寛","瀚率","燦"];
+
+        // 產生不重複 CP 清單
+        const cpList = [];
+        for(let i=0; i<members.length; i++){
+            for(let j=i+1; j<members.length; j++){
+                cpList.push(members[i] + " x " + members[j]);
+            }
+        }
+
+        const nicknameSection = document.getElementById("nickname-section");
+        const gameSection = document.getElementById("game-section");
+        const cpListDiv = document.getElementById("cp-list");
+        const welcomeP = document.getElementById("welcome");
+
+        // 產生勾選清單
+        function generateCpCheckboxes(){
+            cpListDiv.innerHTML = "";
+            cpList.forEach((cp, index) => {
+                const label = document.createElement("label");
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.value = cp;
+                checkbox.id = "cp-" + index;
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(cp));
+                cpListDiv.appendChild(label);
+            });
+        }
+
+        document.getElementById("start-btn").onclick = function(){
+            const nickname = document.getElementById("nickname").value.trim();
+            if(nickname === ""){
+                alert("請輸入暱稱！");
+                return;
+            }
+            nicknameSection.style.display = "none";
+            gameSection.style.display = "block";
+            welcomeP.textContent = `${nickname}，你好！`;
+            generateCpCheckboxes();
+        };
+
+        document.getElementById("submit-btn").onclick = function(){
+            const nickname = welcomeP.textContent.replace("，你好！","");
+            const checkedCps = [];
+            const checkboxes = cpListDiv.querySelectorAll("input[type='checkbox']");
+            checkboxes.forEach(cb => {
+                if(cb.checked){
+                    checkedCps.push(cb.value);
+                }
+            });
+            let result = "";
+            if(checkedCps.length > 0){
+                result = `${nickname}，你選擇的 CP 有：\n\n` + checkedCps.map(cp => "💖 " + cp).join("\n");
+            }else{
+                result = `${nickname}，你沒有選擇任何 CP 😢`;
+            }
+            alert(result + "\n\n💎 Say the name — SEVENTEEN！💎");
+        };
+    </script>
+</body>
+</html>
