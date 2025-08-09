@@ -8,7 +8,7 @@
         h1 { text-align: center; }
         label { display: block; margin: 5px 0; }
         #cp-list { max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; }
-        button { margin-top: 10px; padding: 10px 20px; }
+        button { margin-top: 10px; padding: 10px 20px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -27,7 +27,27 @@
         <button id="submit-btn">提交</button>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"></script>
+
     <script>
+        // 請改成你自己的 Firebase 設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyBp0YT38zifqdSYE42XiLclfSpeaqv3OGY",
+            authDomain: "seventeen-cp-game.firebaseapp.com",
+            databaseURL: "https://seventeen-cp-game-default-rtdb.firebaseio.com",
+            projectId: "seventeen-cp-game",
+            storageBucket: "seventeen-cp-game.firebasestorage.app",
+            messagingSenderId: "114221563004",
+            appId: "1:114221563004:web:45ef13553dad4dd8d21df9",
+            measurementId: "G-WZV22GMKN5"
+        };
+
+        // 初始化 Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         const members = ["勝哲","淨漢","知秀","俊輝","順榮","圓佑","知勳","明浩","珉奎","碩珉","勝寛","瀚率","燦"];
 
         // 產生不重複 CP 清單
@@ -58,6 +78,7 @@
             });
         }
 
+        // 按開始遊戲
         document.getElementById("start-btn").onclick = function(){
             const nickname = document.getElementById("nickname").value.trim();
             if(nickname === ""){
@@ -70,6 +91,7 @@
             generateCpCheckboxes();
         };
 
+        // 按提交
         document.getElementById("submit-btn").onclick = function(){
             const nickname = welcomeP.textContent.replace("，你好！","");
             const checkedCps = [];
@@ -79,6 +101,20 @@
                     checkedCps.push(cb.value);
                 }
             });
+
+            // 把玩家選擇寫入 Firebase Realtime Database
+            if(nickname !== ""){
+                database.ref('players').push({
+                    name: nickname,
+                    selectedCPs: checkedCps,
+                    timestamp: Date.now()
+                }).then(() => {
+                    console.log('資料已成功寫入 Firebase！');
+                }).catch((error) => {
+                    console.error('寫入錯誤:', error);
+                });
+            }
+
             let result = "";
             if(checkedCps.length > 0){
                 result = `${nickname}，你選擇的 CP 有：\n\n` + checkedCps.map(cp => "💖 " + cp).join("\n");
@@ -88,5 +124,27 @@
             alert(result + "\n\n💎 Say the name — SEVENTEEN！💎");
         };
     </script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBp0YT38zifqdSYE42XiLclfSpeaqv3OGY",
+    authDomain: "seventeen-cp-game.firebaseapp.com",
+    databaseURL: "https://seventeen-cp-game-default-rtdb.firebaseio.com",
+    projectId: "seventeen-cp-game",
+    storageBucket: "seventeen-cp-game.firebasestorage.app",
+    messagingSenderId: "114221563004",
+    appId: "1:114221563004:web:45ef13553dad4dd8d21df9",
+    measurementId: "G-WZV22GMKN5"
+  };
+
+  // 初始化 Firebase
+  const app = firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
+
+  // 之後你就可以用 database 物件操作 Realtime Database 了
+</script>
+
 </body>
 </html>
