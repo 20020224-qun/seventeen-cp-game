@@ -33,25 +33,27 @@
     <ul id="cpList"></ul>
   </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <!-- 用 Firebase 最新的 ES 模組 CDN -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
 
-  <script>
-    // 這裡換成你的 Firebase 專案設定
+    // 你的 Firebase 配置，請替換成你專案資料
     const firebaseConfig = {
-      apiKey: "你的API_KEY",
-      authDomain: "你的專案ID.firebaseapp.com",
-      databaseURL: "https://你的專案ID-default-rtdb.firebaseio.com",
-      projectId: "你的專案ID",
-      storageBucket: "你的專案ID.appspot.com",
-      messagingSenderId: "你的發送者ID",
-      appId: "你的APP_ID"
+      const firebaseConfig = {
+  apiKey: "AIzaSyBp0YT38zifqdSYE42XiLclfSpeaqv3OGY",
+  authDomain: "seventeen-cp-game.firebaseapp.com",
+  databaseURL: "https://seventeen-cp-game-default-rtdb.firebaseio.com",
+  projectId: "seventeen-cp-game",
+  storageBucket: "seventeen-cp-game.firebasestorage.app",
+  messagingSenderId: "114221563004",
+  appId: "1:114221563004:web:45ef13553dad4dd8d21df9",
+  measurementId: "G-WZV22GMKN5"
     };
 
     // 初始化 Firebase
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
 
     const members = ["勝哲","淨漢","知秀","俊輝","順榮","圓佑","知勳","明浩","珉奎","碩珉","勝寛","瀚率","燦"];
 
@@ -79,61 +81,71 @@
       });
     }
 
+    // 按鈕和 DOM 元素
+    const nicknameInput = document.getElementById("nickname");
+    const nicknameSection = document.getElementById("nickname-section");
+    const gameSection = document.getElementById("game-section");
+    const welcomeP = document.getElementById("welcome");
+    const submitBtn = document.getElementById("submit-btn");
+    const cpListDiv = document.getElementById("cp-list");
+    const cpListElement = document.getElementById("cpList");
+
     // 開始遊戲按鈕事件
-    document.getElementById("start-btn").onclick = function(){
-      const nickname = document.getElementById("nickname").value.trim();
-      if(nickname === ""){
+    document.getElementById("start-btn").onclick = () => {
+      const nickname = nicknameInput.value.trim();
+      if (!nickname) {
         alert("請輸入暱稱！");
         return;
       }
-      document.getElementById("nickname-section").style.display = "none";
-      document.getElementById("game-section").style.display = "block";
-      document.getElementById("welcome").textContent = `${nickname}，你好！`;
+      nicknameSection.style.display = "none";
+      gameSection.style.display = "block";
+      welcomeP.textContent = `${nickname}，你好！`;
       generateCpCheckboxes();
     };
 
     // 提交按鈕事件
-    document.getElementById("submit-btn").onclick = function(){
-      const nickname = document.getElementById("welcome").textContent.replace("，你好！", "");
-      const cpListDiv = document.getElementById("cp-list");
+    submitBtn.onclick = () => {
+      const nickname = welcomeP.textContent.replace("，你好！", "");
       const checkedCps = [];
-      const checkboxes = cpListDiv.querySelectorAll("input[type='checkbox']");
-      checkboxes.forEach(cb => {
+      cpListDiv.querySelectorAll("input[type='checkbox']").forEach(cb => {
         if(cb.checked){
           checkedCps.push(cb.value);
         }
       });
 
-      if(nickname !== ""){
-        database.ref('players').push({
+      if (nickname && checkedCps.length > 0) {
+        push(ref(database, 'players'), {
           name: nickname,
           selectedCPs: checkedCps,
           timestamp: Date.now()
         }).then(() => {
           alert("資料已成功提交！謝謝你的參與！");
-          location.reload(); // 提交後刷新頁面，方便下個玩家加入
-        }).catch((error) => {
+          location.reload();  // 提交後刷新頁面，方便下個玩家加入
+        }).catch(error => {
           alert("資料提交失敗，請稍後再試。");
-          console.error('寫入錯誤:', error);
+          console.error("寫入錯誤:", error);
         });
+      } else {
+        alert("請選擇至少一個 CP！");
       }
     };
 
     // 監聽 Firebase Realtime Database 玩家資料，更新 CP 統計
-    database.ref('players').on('value', (snapshot) => {
+    onValue(ref(database, 'players'), (snapshot) => {
       const data = snapshot.val();
       const cpCount = {};
 
       if(data){
         Object.values(data).forEach(player => {
-          player.selectedCPs.forEach(cp => {
-            cpCount[cp] = (cpCount[cp] || 0) + 1;
-          });
+          if (player.selectedCPs) {
+            player.selectedCPs.forEach(cp => {
+              cpCount[cp] = (cpCount[cp] || 0) + 1;
+            });
+          }
         });
       }
 
       // 顯示統計結果
-      const cpListElement = document.getElementById('cpList');
       cpListElement.innerHTML = "";
       Object.entries(cpCount).forEach(([cp, count]) => {
         const li = document.createElement("li");
@@ -144,4 +156,3 @@
   </script>
 </body>
 </html>
-
