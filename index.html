@@ -123,6 +123,41 @@
 </html>
 
     </script>
+<!-- 顯示 CP 統計的區域 -->
+<div id="cpStats">
+  <h2>所有玩家的 CP 統計</h2>
+  <ul id="cpList"></ul>
+</div>
+
+<script>
+  import { ref, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+  const recordsRef = ref(db, 'game_records');
+
+  onValue(recordsRef, (snapshot) => {
+    const data = snapshot.val();
+    const cpCount = {};
+
+    if (data) {
+      Object.values(data).forEach(record => {
+        const cp = record.chosenCP;
+        if (cp) {
+          cpCount[cp] = (cpCount[cp] || 0) + 1;
+        }
+      });
+    }
+
+    // 顯示統計結果
+    const cpListElement = document.getElementById('cpList');
+    cpListElement.innerHTML = ''; // 先清空
+    Object.entries(cpCount).forEach(([cp, count]) => {
+      const li = document.createElement('li');
+      li.textContent = `${cp}: ${count} 人`;
+      cpListElement.appendChild(li);
+    });
+  });
+</script>
+
 </body>
 <h2>CP 統計結果</h2>
 <ul id="cpStats"></ul>
