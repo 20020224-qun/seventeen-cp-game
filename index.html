@@ -33,22 +33,21 @@
     <ul id="cpList"></ul>
   </div>
 
-  <!-- 用 Firebase 最新的 ES 模組 CDN -->
+  <!-- Firebase 最新 ES 模組 CDN -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
     import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
 
-    // 你的 Firebase 配置，請替換成你專案資料
+    // 這裡請換成你的 Firebase 專案設定（從 Firebase 專案設定裡複製）
     const firebaseConfig = {
-      const firebaseConfig = {
-  apiKey: "AIzaSyBp0YT38zifqdSYE42XiLclfSpeaqv3OGY",
-  authDomain: "seventeen-cp-game.firebaseapp.com",
-  databaseURL: "https://seventeen-cp-game-default-rtdb.firebaseio.com",
-  projectId: "seventeen-cp-game",
-  storageBucket: "seventeen-cp-game.firebasestorage.app",
-  messagingSenderId: "114221563004",
-  appId: "1:114221563004:web:45ef13553dad4dd8d21df9",
-  measurementId: "G-WZV22GMKN5"
+      apiKey: "AIzaSyBp0YT38zifqdSYE42XiLclfSpeaqv3OGY",
+      authDomain: "seventeen-cp-game.firebaseapp.com",
+      databaseURL: "https://seventeen-cp-game-default-rtdb.firebaseio.com",
+      projectId: "seventeen-cp-game",
+      storageBucket: "seventeen-cp-game.firebasestorage.app",
+      messagingSenderId: "114221563004",
+      appId: "1:114221563004:web:45ef13553dad4dd8d21df9",
+      measurementId: "G-WZV22GMKN5"
     };
 
     // 初始化 Firebase
